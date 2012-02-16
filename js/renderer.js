@@ -101,7 +101,7 @@ var windowHalfY = HEIGHT / 2;
 var mouseXOnMouseDown, targetRotationOnMouseDown, targetRotation = 0, mouseX = 0, mouseY = 0;
 
 var downX, downY, down = false;
-document.addEventListener('mousedown', function(e) {
+container.addEventListener('mousedown', function(e) {
   downX = e.clientX;
   downY = e.clientY;
   down = true;
@@ -121,7 +121,6 @@ function onDocumentMouseMove( event ) {
   targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
 }
 
-
 (function animloop(){
   requestAnimFrame(animloop);
 
@@ -139,4 +138,9 @@ function onDocumentMouseMove( event ) {
 
   renderer.render(scene, camera);
 })();
+
+// setup the gcode input
+var textarea =document.getElementsByTagName('textarea')[0];
+machine.fromString(textarea.innerHTML);
+machine.begin(function() { console.log('done'); });
 

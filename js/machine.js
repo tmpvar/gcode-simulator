@@ -38,9 +38,9 @@
 
     sync : function() {
       if (this.rendering) {
-        this.models.gantry.top.position.x = this.position.x;
-        this.models.spindle.guide.position.y = this.position.y;
-        this.models.spindle.housing.position.z = this.position.z;
+        this.models.gantry.top.position.x = this.position.x - (this.bounds.x.upper - this.bounds.x.lower)/2;
+        this.models.spindle.guide.position.y = this.position.y - (this.bounds.y.upper - this.bounds.y.lower)/2;
+        this.models.spindle.housing.position.z = this.position.z - (this.bounds.z.upper - this.bounds.z.lower)/2;
       }
     },
 
@@ -64,20 +64,24 @@
       this.models.platform = new THREE.Mesh(
         new THREE.CubeGeometry(
           this.bounds.x.upper - this.bounds.x.lower,
-          this.bounds.y.upper - this.bounds.y.lower,
+          50 + this.bounds.y.upper - this.bounds.y.lower,
           20
         ),
         this.basicMaterial
       );
       this.models.platform.receiveShadow = true;
 
-      this.models.platform.position.set((this.bounds.x.upper - this.bounds.x.lower)/2, (this.bounds.y.upper - this.bounds.y.lower)/2, 0);
+      this.models.platform.position.set(
+          (this.bounds.x.upper - this.bounds.x.lower)/2,
+          25-(this.bounds.y.upper - this.bounds.y.lower)/2,
+          0
+      );
       scene.add(this.models.platform);
 
       this.models.gantry.top = new THREE.Mesh(
         new THREE.CubeGeometry(
           20,
-          this.bounds.y.upper - this.bounds.y.lower,
+          50 + this.bounds.y.upper - this.bounds.y.lower,
           50
         ),
         this.basicMaterial
@@ -85,6 +89,7 @@
 
 
       this.models.gantry.top.position.z = this.bounds.z.upper-this.bounds.z.lower-25;
+
       this.models.platform.add(this.models.gantry.top);
 
       this.models.gantry.left = new THREE.Mesh(
@@ -97,7 +102,7 @@
       );
 
       this.models.gantry.left.position.z = (-this.bounds.z.upper/2) + 20;
-      this.models.gantry.left.position.y = -(this.bounds.y.upper/2) - 5;
+      this.models.gantry.left.position.y = -(this.bounds.y.upper/2) - 30;
       this.models.gantry.top.add(this.models.gantry.left);
 
       this.models.gantry.right = new THREE.Mesh(
@@ -110,7 +115,7 @@
       );
 
 
-      this.models.gantry.right.position.y = (this.bounds.y.upper/2) + 5;
+      this.models.gantry.right.position.y = (this.bounds.y.upper/2) + 30;
       this.models.gantry.right.position.z = (-this.bounds.z.upper/2) + 20;
       this.models.gantry.top.add(this.models.gantry.right);
 
@@ -125,7 +130,7 @@
       );
 
       this.models.spindle.guide.position.z = (this.bounds.z.upper/6);
-      this.models.spindle.guide.position.x = -15;
+      this.models.spindle.guide.position.x = 15;
       this.models.gantry.top.add(this.models.spindle.guide);
 
 
@@ -139,7 +144,7 @@
       );
 
       this.models.spindle.housing.position.z = this.bounds.z.upper/4;
-      this.models.spindle.housing.position.x = -30;
+      this.models.spindle.housing.position.x = 30;
       this.models.spindle.guide.add(this.models.spindle.housing);
 
       this.models.spindle.tool = new THREE.Mesh(
@@ -152,12 +157,15 @@
       this.models.spindle.housing.add(this.models.spindle.tool)
     },
 
+    fromString : function(str) {
+      this.queue = str.split('\n');
+    },
     addLine : function(gcode) {
       if (gcode) {
         this.queue.push(gcode);
       }
     },
-    parseGcode : function(gcode, done) {
+    processLine : function(gcode, done) {
       var
       parts = gcode.toLowerCase().replace(/[ \t]/g,'').match(/[a-z][^a-z]*/ig),
       commandPair = parts.shift(),
@@ -201,7 +209,7 @@
 
                 var
                 now = Date.now(),
-                ratio = vars.f/60000,
+                ratio = vars.f/600000,
                 dx = (vars.x - that.position.x),
                 dy = (vars.y - that.position.y),
                 dz = (vars.z - that.position.z);
@@ -232,22 +240,83 @@
               }, 0);
             break;
 
+            // dwell
+            case 4:
+              setTimeout(done, parseInt(parts.shift().substring(1), 10));
+            break;
+
             // absolute positioning mode (default)
             case 90:
               this.absolute = true;
+              done();
             break;
 
             // relative positioning mode
             case 91:
               this.absolute = false;
+              done();
+            break;
+
+            default:
+              done(new Error('invalid G subcommand'));
             break;
           }
+        break;
+
+        case 'm':
+          switch (subcommand) {
+
+            // spindle on clockwise
+            case 3:
+              done();
+            break;
+
+            // spindle on counter-clockwise
+            case 4:
+              done();
+            break;
+
+            // spindle off
+            case 5:
+              done();
+            break;
+
+            default:
+              done(new Error('invalid M subcommand'));
+            break;
+
+          }
+        break;
+
+        default:
+          done(new Error('invalid command'))
         break;
       }
     },
     processNext : function(done) {
       this.currentGcode = this.queue.shift();
-      parseGcode(this.currentGcode, done);
+      console.log('processing:',this.currentGcode)
+      this.processLine(this.currentGcode, done);
+    },
+    begin : function(fn) {
+      var that = this;
+      clearTimeout(that.timer);
+      var done = function(error) {
+        console.log(error ? error.message : 'ok');
+
+        if (that.queue && that.queue.length > 0) {
+          that.timer = setTimeout(function() {
+            that.processNext(done);
+          }, 16);
+        } else {
+          fn();
+        }
+      };
+
+      done();
+    },
+    cancel : function() {
+      clearTimeout(that.timer);
     }
   };
 
