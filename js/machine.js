@@ -27,6 +27,11 @@
       z : 0
     };
 
+    this.queue = [];
+
+    this.modes = {
+      absolute : true
+    };
   }
 
   Machine.prototype = {
@@ -145,6 +150,104 @@
       this.models.spindle.tool.position.z = -55;
       this.models.spindle.tool.rotation.set(1.57079633, 0 , 0);
       this.models.spindle.housing.add(this.models.spindle.tool)
+    },
+
+    addLine : function(gcode) {
+      if (gcode) {
+        this.queue.push(gcode);
+      }
+    },
+    parseGcode : function(gcode, done) {
+      var
+      parts = gcode.toLowerCase().replace(/[ \t]/g,'').match(/[a-z][^a-z]*/ig),
+      commandPair = parts.shift(),
+      command = commandPair.substring(0,1),
+      subcommand = parseInt(commandPair.substring(1), 10);
+
+      done = done || function() {
+        console.log('DONE!',  JSON.stringify(this.position));
+      };
+
+      switch (command) {
+        case 'g':
+          switch (subcommand) {
+            case 0:
+            case 1:
+              var vars = {
+                x : this.position.x,
+                y : this.position.y,
+                z : this.position.z,
+                f : 600
+              };
+
+
+              while(parts.length > 0) {
+                var part = parts.shift();
+                vars[part.substring(0,1)] = parseFloat(part.substring(1));
+              }
+
+              // Hande relative positioning
+              if (this.absolute === false) {
+                vars.x += this.position.x;
+                vars.y += this.position.y;
+                vars.z += this.position.z;
+              }
+
+              var
+              that = this,
+              start = Date.now();
+
+              setTimeout(function movementTick() {
+
+                var
+                now = Date.now(),
+                ratio = vars.f/60000,
+                dx = (vars.x - that.position.x),
+                dy = (vars.y - that.position.y),
+                dz = (vars.z - that.position.z);
+
+                if (Math.abs(dx) > ((now - start) * ratio)) {
+                  that.position.x += dx * ((now - start) * ratio);
+                } else {
+                  that.position.x = vars.x;
+                }
+
+                if (Math.abs(dy) > ((now - start) * ratio)) {
+                  that.position.y += dy * ((now - start) * ratio);
+                } else {
+                  that.position.y = vars.y;
+                }
+
+                if (Math.abs(dz) > ((now - start) * ratio)) {
+                  that.position.z += dz * ((now - start) * ratio);
+                } else {
+                  that.position.z = vars.z;
+                }
+
+                if (that.position.x !== vars.x || that.position.y !== vars.y || that.position.z !== vars.z) {
+                 setTimeout(movementTick, 16);
+                } else {
+                  done();
+                }
+              }, 0);
+            break;
+
+            // absolute positioning mode (default)
+            case 90:
+              this.absolute = true;
+            break;
+
+            // relative positioning mode
+            case 91:
+              this.absolute = false;
+            break;
+          }
+        break;
+      }
+    },
+    processNext : function(done) {
+      this.currentGcode = this.queue.shift();
+      parseGcode(this.currentGcode, done);
     }
   };
 

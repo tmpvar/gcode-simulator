@@ -32,10 +32,6 @@ var scene = new THREE.Scene();
 // so pull it back
 camera.position.set(0, -1200, 900);
 
-
-
-
-
 scene.add(camera);
 
 // start the renderer
@@ -120,7 +116,6 @@ document.addEventListener('mousedown', function(e) {
 
 
 function onDocumentMouseMove( event ) {
-
   mouseX = ((event.clientX-downX));
   mouseY = ((event.clientY-downY));
   targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
@@ -139,9 +134,8 @@ function onDocumentMouseMove( event ) {
     }
   }
 
-
   camera.lookAt(machine.models.spindle.tool.matrixWorld.getPosition());
-  camera.rotation.z = 0;
+  camera.rotation.z = -.05;
 
   renderer.render(scene, camera);
 })();
