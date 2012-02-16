@@ -40,7 +40,7 @@
       if (this.rendering) {
         this.models.gantry.top.position.x = this.position.x - (this.bounds.x.upper - this.bounds.x.lower)/2;
         this.models.spindle.guide.position.y = this.position.y - (this.bounds.y.upper - this.bounds.y.lower)/2;
-        this.models.spindle.housing.position.z = this.position.z - (this.bounds.z.upper - this.bounds.z.lower)/2;
+        this.models.spindle.housing.position.z = (this.bounds.z.upper - this.bounds.z.lower)/2 - this.position.z;
       }
     },
 
@@ -148,11 +148,11 @@
       this.models.spindle.guide.add(this.models.spindle.housing);
 
       this.models.spindle.tool = new THREE.Mesh(
-        new THREE.CylinderGeometry(4, 4, 16, 16, false),
+        new THREE.CylinderGeometry(4, 1, 16, 16, false),
         this.activeMaterial
       );
 
-      this.models.spindle.tool.position.z = -55;
+      this.models.spindle.tool.position.z = -58;
       this.models.spindle.tool.rotation.set(1.57079633, 0 , 0);
       this.models.spindle.housing.add(this.models.spindle.tool)
     },
@@ -209,7 +209,7 @@
 
                 var
                 now = Date.now(),
-                ratio = vars.f/600000,
+                ratio = vars.f/6000000,
                 dx = (vars.x - that.position.x),
                 dy = (vars.y - that.position.y),
                 dz = (vars.z - that.position.z);

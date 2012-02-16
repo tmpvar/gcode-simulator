@@ -30,7 +30,7 @@ var scene = new THREE.Scene();
 
 // the camera starts at 0,0,0
 // so pull it back
-camera.position.set(0, -1200, 900);
+camera.position.set(1000, -600, 200);
 
 scene.add(camera);
 
@@ -134,7 +134,7 @@ function onDocumentMouseMove( event ) {
   }
 
   camera.lookAt(machine.models.spindle.tool.matrixWorld.getPosition());
-  camera.rotation.z = -.05;
+  camera.rotation.z = .75;
 
   renderer.render(scene, camera);
 })();
