@@ -6,9 +6,7 @@
   <script type="text/javascript" src="js/gcode-simulator.js"></script>
   <script type="text/javascript" src="js/machine.js"></script>
   <style>
-    body {
-      padding: 10px ;
-    }
+
     .pane {
       background-color: #f0f0f0;
       border: 1px solid #d0d0d0;
@@ -21,23 +19,55 @@
     .top10px {
       padding-top: 10px;
     }
+
+    .options {
+      border-bottom: 1px solid #a0a0a0;
+      padding-bottom:20px;
+      background: #cfcfcf;
+    }
+
+    .options .pane {
+      border: 1px solid #b0b0b0;
+    }
   </style>
 </head>
 <body>
-  <section class="row">
-    <section class="span12 pane">
+  <section class="row options">
+    <section class="span4 pane">
       <h3 class="left10px">workarea extents</h3>
-      <form class="span3">
         <p>
-          X <input class="span1" name="x-min" type="text" value="0" /> - <input class="span1" type="text" name="x-max"  value="600"/>
+          <label class="span1">X</label>
+          <input class="span1" name="x-min" type="text" value="0" />
+          <input class="span1" type="text" name="x-max"  value="600"/>
         </p>
         <p>
-          Y <input class="span1" name="x-min" type="text" value="0" /> - <input class="span1" type="text" name="x-max" value="600" />
+          <label class="span1">Y</label>
+          <input class="span1" name="x-min" type="text" value="0" />
+          <input class="span1" type="text" name="x-max" value="600" />
         </p>
         <p>
-          Z <input class="span1" name="x-min" type="text" value="0" /> - <input class="span1" type="text" name="x-max" value="150"/>
+          <label class="span1">Z</label>
+          <input class="span1" name="x-min" type="text" value="0" />
+          <input class="span1" type="text" name="x-max" value="150"/>
         </p>
-      </form>
+    </section>
+    <section class=" span4 pane">
+      <h3 class="left10px">tooling</h3>
+        <p>
+          <label class="span2">Safe Z</label><input class="span1" name="z-safe" type="text" value="142" />
+        </p>
+        <p>
+          <label class="span2">Cut Z</label><input class="span1" name="z-cut" type="text" value="144" />
+        </p>
+        <p>
+          <label class="span2">Feed Rate</label> <input class="span1" name="x-min" type="text" value="900" />
+        </p>
+    </section>
+    <section class=" span4 pane">
+      <h3 class="left10px">simulation speed</h3>
+        <p>
+          <label class="span2">Percent</label><input class="span1" name="z-safe" type="text" value="100" />
+        </p>
     </section>
   </section>
   <section class="row">
@@ -219,7 +249,7 @@ M5
 G1 Z0 F300
 G1 X0 Y0 F800</textarea>
     </section>
-    <section class="span6 pane" id="3d" style="background:#a0a0a0" ></section>
+    <section class="span6 pane" id="3d" ></section>
   </section>
   <script type="text/javascript" src="js/renderer.js"></script>
 </body>
