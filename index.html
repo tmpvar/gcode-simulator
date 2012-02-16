@@ -1,0 +1,51 @@
+<html>
+<head>
+  <title></title>
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+  <script type="text/javascript" src="js/three.js"></script>
+  <script type="text/javascript" src="js/gcode-simulator.js"></script>
+  <script type="text/javascript" src="js/machine.js"></script>
+  <style>
+    body {
+      padding: 10px ;
+    }
+    .pane {
+      background-color: #f0f0f0;
+      border: 1px solid #d0d0d0;
+      margin-top: 20px;
+    }
+    .left10px {
+      padding-left: 10px;
+    }
+
+    .top10px {
+      padding-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <section class="row">
+    <section class="span12 pane">
+      <h3 class="left10px">workarea extents</h3>
+      <form class="span3">
+        <p>
+          X <input class="span1" name="x-min" type="text" /> - <input class="span1" type="text" name="x-max" />
+        </p>
+        <p>
+          Y <input class="span1" name="x-min" type="text" /> - <input class="span1" type="text" name="x-max" />
+        </p>
+        <p>
+          Z <input class="span1" name="x-min" type="text" /> - <input class="span1" type="text" name="x-max" />
+        </p>
+      </form>
+    </section>
+  </section>
+  <section class="row">
+    <section class="span6 pane left10px top10px" id="editor">
+      <textarea class="span6" rows="30"></textarea>
+    </section>
+    <section class="span6 pane" id="3d" style="background:#a0a0a0" ></section>
+  </section>
+  <script type="text/javascript" src="js/renderer.js"></script>
+</body>
+</html>
