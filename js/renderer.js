@@ -121,6 +121,8 @@ function onDocumentMouseMove( event ) {
   targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
 }
 
+
+
 (function animloop(){
   requestAnimFrame(animloop);
 
@@ -141,8 +143,22 @@ function onDocumentMouseMove( event ) {
   renderer.render(scene, camera);
 })();
 
+
+
 // setup the gcode input
 var textarea =document.getElementsByTagName('textarea')[0];
-machine.fromString(textarea.innerHTML);
+var gcodes = textarea.value;
+machine.fromString(gcodes);
 machine.begin(function() { console.log('done'); });
+
+textarea.addEventListener('keyup', function() {
+  if (gcodes !== textarea.value) {
+    gcodes = textarea.value;
+    machine.cancel();
+    machine.fromString(textarea.value);
+    machine.begin(function() {
+      console.log('done');
+    });
+  }
+});
 

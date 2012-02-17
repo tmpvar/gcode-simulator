@@ -27,6 +27,8 @@
       z : 0
     };
 
+    this.lines = [];
+
     this.settings = {
       zSafe : 142,
       zCut : 144
@@ -171,6 +173,7 @@
       }
     },
     processLine : function(gcode, done) {
+      if (!gcode) { return done() };
       var
       parts = gcode.toLowerCase().replace(/[ \t]/g,'').match(/[a-z][^a-z]*/ig),
       commandPair = parts.shift(),
@@ -243,7 +246,6 @@
                   that.position.z = vars.z;
                 }
 
-                console.log(that.position.z,that.settings.zCut);
                 if (that.position.z > that.settings.zCut) {
                   var geometry = new THREE.Geometry();
                   var offx = 35, offy = 25, offz = 88;
@@ -255,18 +257,18 @@
                     )
                   );
 
-
-                  that.models.platform.add(
-                    new THREE.Line(
-                      geometry,
-                      new THREE.LineBasicMaterial( { color: 0x0057FF, linewidth: 2, opacity: 0.7 } ),
-                      THREE.LinePieces
-                    )
+                  var line = new THREE.Line(
+                    geometry,
+                    new THREE.LineBasicMaterial( { color: 0x0057FF, linewidth: 2, opacity: 0.7 } ),
+                    THREE.LinePieces
                   );
+                  that.lines.push(line);
+                  that.models.platform.add(line);
+
                 }
 
                 if (that.position.x !== vars.x || that.position.y !== vars.y || that.position.z !== vars.z) {
-                 setTimeout(movementTick, 16);
+                 that.timer = setTimeout(movementTick, 16);
                 } else {
                   done();
                 }
@@ -349,7 +351,15 @@
       done();
     },
     cancel : function() {
-      clearTimeout(that.timer);
+      clearTimeout(this.timer);
+      this.queue = [];
+      var that = this;
+      this.position = { x : 0, y :0, z : 0};
+
+      while (this.lines.length > 0) {
+        var line = this.lines.pop();
+        this.models.platform.remove(line);
+      }
     }
   };
 
