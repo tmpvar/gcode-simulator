@@ -211,7 +211,13 @@
 
               var
               that = this,
-              start = Date.now();
+              start = Date.now()
+              ox = that.position.x,
+              oy = that.position.y,
+              oz = that.position.z,
+              rx = ((that.bounds.x.upper - that.bounds.x.lower)/2)-45,
+              ry = ((that.bounds.y.upper - that.bounds.y.lower)/2),
+              rz = ((that.bounds.z.upper - that.bounds.z.lower)/2)+85;
 
               setTimeout(function movementTick() {
 
@@ -220,13 +226,7 @@
                 ratio = vars.f/600000,
                 dx = (vars.x - that.position.x),
                 dy = (vars.y - that.position.y),
-                dz = (vars.z - that.position.z),
-                ox = that.position.x,
-                oy = that.position.y,
-                oz = that.position.z,
-                rx = ((that.bounds.x.upper - that.bounds.x.lower)/2)-45,
-                ry = ((that.bounds.y.upper - that.bounds.y.lower)/2),
-                rz = ((that.bounds.z.upper - that.bounds.z.lower)/2)+85;
+                dz = (vars.z - that.position.z);
 
                 if (Math.abs(dx) > ((now - start) * ratio)) {
                   that.position.x += dx * ((now - start) * ratio);
@@ -246,30 +246,32 @@
                   that.position.z = vars.z;
                 }
 
-                if (that.position.z > that.settings.zCut) {
-                  var geometry = new THREE.Geometry();
-                  var offx = 35, offy = 25, offz = 88;
 
-                  geometry.vertices.push(new THREE.Vertex(new THREE.Vector3(ox - rx, oy - ry, rz - oz)));
-                  geometry.vertices.push(
-                    new THREE.Vertex(
-                      new THREE.Vector3(that.position.x-rx, that.position.y-ry, rz - that.position.z)
-                    )
-                  );
-
-                  var line = new THREE.Line(
-                    geometry,
-                    new THREE.LineBasicMaterial( { color: 0x0057FF, linewidth: 2, opacity: 0.7 } ),
-                    THREE.LinePieces
-                  );
-                  that.lines.push(line);
-                  that.models.platform.add(line);
-
-                }
 
                 if (that.position.x !== vars.x || that.position.y !== vars.y || that.position.z !== vars.z) {
                  that.timer = setTimeout(movementTick, 16);
                 } else {
+                  if (that.position.z > that.settings.zCut) {
+                    var geometry = new THREE.Geometry();
+                    var offx = 35, offy = 25, offz = 88;
+
+                    geometry.vertices.push(new THREE.Vertex(new THREE.Vector3(ox - rx, oy - ry, rz - oz)));
+                    geometry.vertices.push(
+                      new THREE.Vertex(
+                        new THREE.Vector3(that.position.x-rx, that.position.y-ry, rz - that.position.z)
+                      )
+                    );
+
+                    var line = new THREE.Line(
+                      geometry,
+                      new THREE.LineBasicMaterial( { color: 0x0057FF, linewidth: 2, opacity: 0.7 } ),
+                      THREE.LinePieces
+                    );
+                    that.lines.push(line);
+                    that.models.platform.add(line);
+
+                  }
+
                   done();
                 }
               }, 0);
@@ -342,7 +344,7 @@
         if (that.queue && that.queue.length > 0) {
           that.timer = setTimeout(function() {
             that.processNext(done);
-          }, 16);
+          }, 0);
         } else {
           fn();
         }

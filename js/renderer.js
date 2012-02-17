@@ -123,9 +123,12 @@ function onDocumentMouseMove( event ) {
 
 
 
+var stats = new Stats();
+document.body.appendChild(stats.getDomElement());
+
 (function animloop(){
   requestAnimFrame(animloop);
-
+  stats.update();
   machine.sync();
 
   if (down) {
@@ -151,14 +154,19 @@ var gcodes = textarea.value;
 machine.fromString(gcodes);
 machine.begin(function() { console.log('done'); });
 
+var changing = false;
 textarea.addEventListener('keyup', function() {
   if (gcodes !== textarea.value) {
-    gcodes = textarea.value;
-    machine.cancel();
-    machine.fromString(textarea.value);
-    machine.begin(function() {
-      console.log('done');
-    });
+    clearTimeout(changing);
+    changing = setTimeout(function() {
+      gcodes = textarea.value;
+      machine.cancel();
+      machine.fromString(textarea.value);
+      machine.begin(function() {
+        console.log('done');
+      });
+    }, 1000);
   }
 });
+
 
