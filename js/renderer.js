@@ -30,8 +30,8 @@ var scene = new THREE.Scene();
 
 // the camera starts at 0,0,0
 // so pull it back
-camera.position.set(1000, -600, 200);
-
+camera.position.set(200, -200, 700);
+camera.rotation.z = 1.57
 scene.add(camera);
 
 // start the renderer
@@ -133,9 +133,11 @@ function onDocumentMouseMove( event ) {
     }
   }
 
-  camera.lookAt(machine.models.spindle.tool.matrixWorld.getPosition());
-  camera.rotation.z = .75;
+  camera.position.x = machine.models.spindle.tool.matrixWorld.getPosition().x;
+  camera.position.y = machine.models.spindle.tool.matrixWorld.getPosition().y;
 
+  //camera.lookAt(machine.models.platform.matrixWorld.getPosition());
+  //camera.rotation.z = 1.5
   renderer.render(scene, camera);
 })();
 

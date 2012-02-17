@@ -4,11 +4,11 @@
     this.bounds = {
       x: {
         lower : 0,
-        upper : 600
+        upper : 1000
       },
       y : {
         lower : 0,
-        upper : 600
+        upper : 1000
       },
       z : {
         lower : 0,
@@ -25,6 +25,11 @@
       x : 0,
       y : 0,
       z : 0
+    };
+
+    this.settings = {
+      zSafe : 142,
+      zCut : 144
     };
 
     this.queue = [];
@@ -209,10 +214,16 @@
 
                 var
                 now = Date.now(),
-                ratio = vars.f/6000000,
+                ratio = vars.f/600000,
                 dx = (vars.x - that.position.x),
                 dy = (vars.y - that.position.y),
-                dz = (vars.z - that.position.z);
+                dz = (vars.z - that.position.z),
+                ox = that.position.x,
+                oy = that.position.y,
+                oz = that.position.z,
+                rx = ((that.bounds.x.upper - that.bounds.x.lower)/2)-45,
+                ry = ((that.bounds.y.upper - that.bounds.y.lower)/2),
+                rz = ((that.bounds.z.upper - that.bounds.z.lower)/2)+85;
 
                 if (Math.abs(dx) > ((now - start) * ratio)) {
                   that.position.x += dx * ((now - start) * ratio);
@@ -230,6 +241,28 @@
                   that.position.z += dz * ((now - start) * ratio);
                 } else {
                   that.position.z = vars.z;
+                }
+
+                console.log(that.position.z,that.settings.zCut);
+                if (that.position.z > that.settings.zCut) {
+                  var geometry = new THREE.Geometry();
+                  var offx = 35, offy = 25, offz = 88;
+
+                  geometry.vertices.push(new THREE.Vertex(new THREE.Vector3(ox - rx, oy - ry, rz - oz)));
+                  geometry.vertices.push(
+                    new THREE.Vertex(
+                      new THREE.Vector3(that.position.x-rx, that.position.y-ry, rz - that.position.z)
+                    )
+                  );
+
+
+                  that.models.platform.add(
+                    new THREE.Line(
+                      geometry,
+                      new THREE.LineBasicMaterial( { color: 0x0057FF, linewidth: 2, opacity: 0.7 } ),
+                      THREE.LinePieces
+                    )
+                  );
                 }
 
                 if (that.position.x !== vars.x || that.position.y !== vars.y || that.position.z !== vars.z) {
