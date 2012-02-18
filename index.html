@@ -1,6 +1,7 @@
 <html>
 <head>
-  <title></title>
+  <title>WebGL Gcode simulator</title>
+  <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
   <script type="text/javascript" src="js/three.js"></script>
   <script type="text/javascript" src="js/gcode-simulator.js"></script>
@@ -36,8 +37,8 @@
   </style>
 </head>
 <body>
-  <section class="row options">
-    <section class="span4 pane">
+  <section class="row options" style="display:none">
+    <section class="span4 pane"  >
       <h3 class="left10px">workarea extents</h3>
         <p>
           <label class="span1">X</label>
@@ -55,6 +56,8 @@
           <input class="span1" type="text" name="zmax" value="150"/>
         </p>
     </section>
+
+
     <section class=" span4 pane">
       <h3 class="left10px">tooling</h3>
         <p>
@@ -80,6 +83,26 @@
         </p>
     </section>
   </section>
+  <section class="row span12">
+    <section class="span4">
+      <h1>gcode simulator</h1>
+      <p>This is a small utility that tests the viability of gcode for a cnc machine!</p>
+      <h2>Usage</h2>
+      <p>
+        Either paste some svg into the svg box or gcode into the gcode box.  The 3d model on the right will animate the steps the machine should take, while leaving a trail of cuts.
+      </p>
+    </section>
+
+    <section class="offset2 span4">
+      <h2>meta</h2>
+      <p>created by <a href="http://twitter.com/tmpvar">@tmpvar</a></p>
+      <iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=tmpvar&repo=gcode-simulator&type=fork&count=true&size=large"
+  allowtransparency="true" frameborder="0" scrolling="0" width="160" height="50px"></iframe>
+
+    </section>
+
+  </section>
+
   <section class="row">
     <section class="span6">
       <section class="span5 pane left10px top10px">
