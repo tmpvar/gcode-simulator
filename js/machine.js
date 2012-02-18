@@ -12,7 +12,7 @@
       },
       z : {
         lower : 0,
-        upper : 150
+        upper : 120
       }
     };
 
@@ -30,8 +30,8 @@
     this.lines = [];
 
     this.settings = {
-      zSafe : 142,
-      zCut : 144
+      zSafe : 106,
+      zCut : 108
     };
 
     this.queue = [];
@@ -47,7 +47,7 @@
       if (this.rendering) {
         this.models.gantry.top.position.x = this.position.x - (this.bounds.x.upper - this.bounds.x.lower)/2;
         this.models.spindle.guide.position.y = this.position.y - (this.bounds.y.upper - this.bounds.y.lower)/2;
-        this.models.spindle.housing.position.z = (this.bounds.z.upper - this.bounds.z.lower)/2 - this.position.z;
+        this.models.spindle.housing.position.z = ((this.bounds.z.upper - this.bounds.z.lower)/2 - this.position.z) + 15;
       }
     },
 
@@ -217,7 +217,7 @@
               oz = that.position.z,
               rx = ((that.bounds.x.upper - that.bounds.x.lower)/2)-45,
               ry = ((that.bounds.y.upper - that.bounds.y.lower)/2),
-              rz = ((that.bounds.z.upper - that.bounds.z.lower)/2)+85;
+              rz = ((that.bounds.z.upper - that.bounds.z.lower)/2)+65;
 
               setTimeout(function movementTick() {
 
@@ -253,7 +253,6 @@
                 } else {
                   if (that.position.z > that.settings.zCut) {
                     var geometry = new THREE.Geometry();
-                    var offx = 35, offy = 25, offz = 88;
 
                     geometry.vertices.push(new THREE.Vertex(new THREE.Vector3(ox - rx, oy - ry, rz - oz)));
                     geometry.vertices.push(
