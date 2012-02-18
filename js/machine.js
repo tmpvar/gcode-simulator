@@ -251,7 +251,7 @@
                 if (that.position.x !== vars.x || that.position.y !== vars.y || that.position.z !== vars.z) {
                  that.timer = setTimeout(movementTick, 16);
                 } else {
-                  if (that.position.z > that.settings.zCut) {
+                  if (oz > that.settings.zCut && that.position.z > that.settings.zCut) {
                     var geometry = new THREE.Geometry();
 
                     geometry.vertices.push(new THREE.Vertex(new THREE.Vector3(ox - rx, oy - ry, rz - oz)));

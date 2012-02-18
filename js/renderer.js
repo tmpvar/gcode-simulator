@@ -30,7 +30,7 @@ var scene = new THREE.Scene();
 
 // the camera starts at 0,0,0
 // so pull it back
-camera.position.set(1900, -200, 600);
+camera.position.set(1900, -200, 300);
 //camera.lookAt(new Vector3(0,0,0));
 camera.rotation.x = 2.5;
 camera.rotation.y = 1.85;
@@ -153,19 +153,19 @@ document.body.appendChild(stats.getDomElement());
 
 
 // setup the gcode input
-var textarea =document.getElementsByTagName('textarea')[0];
-var gcodes = textarea.value;
+var gcodeElement =document.getElementById('gcode');
+var gcodes = gcodeElement.value;
 machine.fromString(gcodes);
 machine.begin(function() { console.log('done'); });
 
 var changing = false;
-textarea.addEventListener('keyup', function() {
+gcodeElement.addEventListener('keyup', function() {
   if (gcodes !== textarea.value) {
     clearTimeout(changing);
     changing = setTimeout(function() {
-      gcodes = textarea.value;
+      gcodes = gcodeElement.value;
       machine.cancel();
-      machine.fromString(textarea.value);
+      machine.fromString(gcodes);
       machine.begin(function() {
         console.log('done');
       });
