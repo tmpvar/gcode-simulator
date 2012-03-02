@@ -124,8 +124,11 @@ SVGReader = {
           for (var k=0; k<node.path.length; k++) {
             var subpath = node.path[k];
             for (var l=0; l<node.path[k].length; l++) {
-              subpath[l] =  this.matrixApply(node.xformToWorld, subpath[l]);
+              var tmp =  this.matrixApply(node.xformToWorld, subpath[l]);
+              subpath[l] = new Vec2(tmp[0], tmp[1]);
             }
+            subpath.node = node;
+
             this.boundarys.allcolors.push(subpath);
           }
         }

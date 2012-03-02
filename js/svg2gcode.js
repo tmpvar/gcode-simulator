@@ -2,32 +2,28 @@ function svg2gcode(svg, settings) {
   // clean off any preceding whitespace
   svg = svg.replace(/^[\n\r \t]/gm, '');
   settings = settings || {};
-  settings.passes = settings.passes || 3;
+  settings.passes = settings.passes || 1;
   settings.materialWidth = settings.materialWidth || 6;
   settings.passWidth = settings.materialWidth/settings.passes;
   settings.scale = settings.scale || -1;
   settings.cutZ = settings.cutZ || -108; // cut z
   settings.safeZ = settings.safeZ || -106;   // safe z
-  settings.feedRate = settings.feedRate || 800;
+  settings.feedRate = settings.feedRate || 1400;
   settings.seekRate = settings.seekRate || 1100;
+  settings.bitWidth = settings.bitWidth || 1; // in mm
 
   var
   scale=function(val) {
     return val * settings.scale
   },
   paths = SVGReader.parse(svg, {}).allcolors,
-  gcode = [
-    'G90',
-    'G1 Z' + settings.safeZ,
-    'G82',
-    'M4'
-  ],
+  gcode,
   path;
 
   var idx = paths.length;
   while(idx--) {
     var subidx = paths[idx].length;
-    var bounds = { x : Infinity , y : Infinity, x2 : Infinity, y2: Infinity, area : 0};
+    var bounds = { x : Infinity , y : Infinity, x2 : -Infinity, y2: -Infinity, area : 0};
 
     // find lower and upper bounds
     while(subidx--) {
@@ -39,34 +35,44 @@ function svg2gcode(svg, settings) {
         bounds.y = paths[idx][subidx][0];
       }
 
-      if (paths[idx][subidx][0] < bounds.x2) {
+      if (paths[idx][subidx][0] > bounds.x2) {
         bounds.x2 = paths[idx][subidx][0];
       }
-      if (paths[idx][subidx][1] < bounds.y2) {
+      if (paths[idx][subidx][1] > bounds.y2) {
         bounds.y2 = paths[idx][subidx][0];
       }
     }
 
     // calculate area
-    bounds.area = (bounds.x2 - bounds.x) * (bounds.y2-bounds.y);
+    bounds.area = (1 + bounds.x2 - bounds.x) * (1 + bounds.y2-bounds.y);
     paths[idx].bounds = bounds;
   }
 
   // cut the inside parts first
   paths.sort(function(a, b) {
     // sort by area
-    return (a.bounds.area < b.bounds.area)
+    return (a.bounds.area < b.bounds.area) ? -1 : 1;
   });
+
+  gcode = [
+    'G90',
+    'G1 Z' + settings.safeZ,
+    'G82',
+    'M4'
+  ];
 
   for (var pathIdx = 0, pathLength = paths.length; pathIdx < pathLength; pathIdx++) {
     path = paths[pathIdx];
 
     // seek to index 0
     gcode.push(['G1',
-      'X' + scale(path[0][0]),
-      'Y' + scale(path[0][1]),
+      'X' + scale(path[0].x),
+      'Y' + scale(path[0].y),
       'F' + settings.seekRate
     ].join(' '));
+
+    var inset = (path.node.fill[0] !== 0 && path.node.fill[1] === 0 && path.node.fill[2] === 0);
+    var outset = (path.node.fill[0] === 0 && path.node.fill[1] !== 0 && path.node.fill[2] === 0);
 
     for (var p = settings.passWidth; p<=settings.materialWidth; p+=settings.passWidth) {
 
@@ -80,11 +86,10 @@ function svg2gcode(svg, settings) {
       var localPath = [];
       for (var segmentIdx=0, segmentLength = path.length; segmentIdx<segmentLength; segmentIdx++) {
         var segment = path[segmentIdx];
-        // TODO: handle the special case of a single line.
 
         var localSegment = ['G1',
-          'X' + scale(segment[0]),
-          'Y' + scale(segment[1]),
+          'X' + scale(segment.x),
+          'Y' + scale(segment.y),
           'F' + settings.feedRate
         ].join(' ');
 
@@ -93,8 +98,9 @@ function svg2gcode(svg, settings) {
         localPath.push(localSegment);
 
         // if the path is not closed, reverse it, drop to the next cut depth and cut
+        // this handles lines
         if (segmentIdx === segmentLength - 1 &&
-            (segment[0] !== path[0][0] || segment[1] !== path[0][1]))
+            (segment.x !== path[0].x || segment.y !== path[0].y))
         {
 
           p+=settings.passWidth;
