@@ -1,7 +1,6 @@
 function svg2gcode(svg, settings) {
   // clean off any preceding whitespace
   svg = svg.replace(/^[\n\r \t]/gm, '');
-console.log(svg)
   settings = settings || {};
   settings.passes = settings.passes || 3;
   settings.materialWidth = settings.materialWidth || 6;
@@ -9,7 +8,7 @@ console.log(svg)
   settings.scale = settings.scale || -1;
   settings.cutZ = settings.cutZ || -108; // cut z
   settings.safeZ = settings.safeZ || -106;   // safe z
-  settings.feedRate = settings.feedrate || 800;
+  settings.feedRate = settings.feedRate || 800;
   settings.seekRate = settings.seekRate || 1100;
 
   var
@@ -22,10 +21,45 @@ console.log(svg)
     'G1 Z' + settings.safeZ,
     'G82',
     'M4'
-  ];
+  ],
+  path;
+
+  var idx = paths.length;
+  while(idx--) {
+    var subidx = paths[idx].length;
+    var bounds = { x : Infinity , y : Infinity, x2 : Infinity, y2: Infinity, area : 0};
+
+    // find lower and upper bounds
+    while(subidx--) {
+      if (paths[idx][subidx][0] < bounds.x) {
+        bounds.x = paths[idx][subidx][0];
+      }
+
+      if (paths[idx][subidx][1] < bounds.y) {
+        bounds.y = paths[idx][subidx][0];
+      }
+
+      if (paths[idx][subidx][0] < bounds.x2) {
+        bounds.x2 = paths[idx][subidx][0];
+      }
+      if (paths[idx][subidx][1] < bounds.y2) {
+        bounds.y2 = paths[idx][subidx][0];
+      }
+    }
+
+    // calculate area
+    bounds.area = (bounds.x2 - bounds.x) * (bounds.y2-bounds.y);
+    paths[idx].bounds = bounds;
+  }
+
+  // cut the inside parts first
+  paths.sort(function(a, b) {
+    // sort by area
+    return (a.bounds.area < b.bounds.area)
+  });
 
   for (var pathIdx = 0, pathLength = paths.length; pathIdx < pathLength; pathIdx++) {
-    var path = paths[pathIdx];
+    path = paths[pathIdx];
 
     // seek to index 0
     gcode.push(['G1',
