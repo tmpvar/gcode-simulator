@@ -160,7 +160,7 @@ machine.begin(function() { console.log('done'); });
 
 var changing = false;
 gcodeElement.addEventListener('keyup', function() {
-  if (gcodes !== textarea.value) {
+  if (gcodes !== gcodeElement.value) {
     clearTimeout(changing);
     changing = setTimeout(function() {
       gcodes = gcodeElement.value;
