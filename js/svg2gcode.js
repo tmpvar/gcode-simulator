@@ -71,9 +71,6 @@ function svg2gcode(svg, settings) {
       'F' + settings.seekRate
     ].join(' '));
 
-    var inset = (path.node.fill[0] !== 0 && path.node.fill[1] === 0 && path.node.fill[2] === 0);
-    var outset = (path.node.fill[0] === 0 && path.node.fill[1] !== 0 && path.node.fill[2] === 0);
-
     for (var p = settings.passWidth; p<=settings.materialWidth; p+=settings.passWidth) {
 
       // begin the cut by dropping the tool to the work
