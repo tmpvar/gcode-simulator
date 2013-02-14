@@ -627,18 +627,13 @@ SVGReader = {
           }
           break;
         case 'Z':  // closepath
-          // loop and finalize subpath
-          if ( subpath.length > 0) {
-            subpath.push(subpath[0]);  // close
-            node.path.push(subpath);
-            subpath = [];
-          }
-          break;
         case 'z':  // closepath
           // loop and finalize subpath
           if ( subpath.length > 0) {
             subpath.push(subpath[0]);  // close
             node.path.push(subpath);
+            x = subpath[subpath.length-1][0];
+            y = subpath[subpath.length-1][1];
             subpath = [];
           }
           break
