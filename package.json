@@ -1,6 +1,6 @@
 {
   "name": "gcode-simulator",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Simulate a cnc machine",
   "main": "index.js",
   "directories": {
@@ -19,10 +19,13 @@
     "simulator",
     "svg"
   ],
-  "bin": { "gcode-simulator": "bin/gcode-simulator.js" },
+  "bin": {
+    "gcode-simulator": "bin/gcode-simulator.js"
+  },
   "author": "Elijah Insua <tmpvar@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "node-chrome": "0.0.3-1"
+    "node-chrome": "https://github.com/tmpvar/node-chrome/archive/master.tar.gz",
+    "optimist": "~0.3.5"
   }
 }
