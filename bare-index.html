@@ -1,0 +1,51 @@
+<html>
+<head>
+  <title>WebGL Gcode simulator</title>
+  <link rel="shortcut icon" href="http://tmpvar.com/project/gcode-simulator/img/favicon.ico" />
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+  <script type="text/javascript" src="js/three.js"></script>
+  <script type="text/javascript" src="js/threex.windowresize.js"></script>
+  <script type="text/javascript" src="js/gcode-simulator.js"></script>
+  <script type="text/javascript" src="js/machine.js"></script>
+  <script type="text/javascript" src="js/stats.js"></script>
+  <script type="text/javascript" src="js/vec2.js"></script>
+  <script type="text/javascript" src="js/SVGReader.js"></script>
+  <script type="text/javascript" src="js/svg2gcode.js"></script>
+  <script type="text/javascript" src="js/jquery.js"></script>
+  <style>
+
+    body {
+      overflow:hidden;
+    }
+  </style>
+</head>
+<body>
+  <section class=" pane" id="3d" ></section>
+
+  <script>
+    $(function() {
+      var ws = new WebSocket('ws://localhost:' + window.location.port || 80);
+
+      machine.cancel();
+      ws.addEventListener('message', function(e) {
+        machine.fromString(e.data);
+        machine.begin(function() {
+          window.close();
+        });
+      });
+    });
+
+  </script>
+  <script type="text/javascript" src="js/renderer.js"></script>
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-633948-2']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+</body>
+</html>

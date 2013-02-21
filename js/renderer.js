@@ -26,6 +26,12 @@ var camera =
     NEAR,
     FAR);
 
+if (window.THREEx && THREEx.WindowResize) {
+  console.log("HERE")
+  THREEx.WindowResize(renderer, camera);
+}
+
+
 var scene = new THREE.Scene();
 
 // the camera starts at 0,0,0
@@ -128,7 +134,10 @@ function onDocumentMouseMove( event ) {
 
 
 var stats = new Stats();
-document.body.appendChild(stats.getDomElement());
+stats.domElement.style.position = 'absolute';
+stats.domElement.style.right = '0px';
+stats.domElement.style.top = '0px';
+document.body.appendChild(stats.domElement);
 
 (function animloop(){
   requestAnimFrame(animloop);
@@ -149,28 +158,4 @@ document.body.appendChild(stats.getDomElement());
   //camera.rotation.z = 1.5
   renderer.render(scene, camera);
 })();
-
-
-
-// setup the gcode input
-var gcodeElement =document.getElementById('gcode');
-var gcodes = gcodeElement.value;
-machine.fromString(gcodes);
-machine.begin(function() { console.log('done'); });
-
-var changing = false;
-gcodeElement.addEventListener('keyup', function() {
-  if (gcodes !== gcodeElement.value) {
-    clearTimeout(changing);
-    changing = setTimeout(function() {
-      gcodes = gcodeElement.value;
-      machine.cancel();
-      machine.fromString(gcodes);
-      machine.begin(function() {
-        console.log('done');
-      });
-    }, 1000);
-  }
-});
-
 
