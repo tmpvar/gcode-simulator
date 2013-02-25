@@ -30,7 +30,7 @@
       ws.addEventListener('message', function(e) {
         machine.fromString(e.data);
         machine.begin(function() {
-          window.close();
+          ws.send('done');
         });
       });
     });

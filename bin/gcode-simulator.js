@@ -21,10 +21,9 @@ nc({
       ws.send(gcode);
     });
 
-    ws.on('data', function(d) {
-      if (d.toString().indexOf('done') > -1) {
-        process.exit();
-      }
+    ws.on('close', function() {
+      chrome.kill('SIGKILL');
+      process.exit();
     });
 
     process.stdin.resume();

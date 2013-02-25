@@ -1,6 +1,6 @@
 {
   "name": "gcode-simulator",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Simulate a cnc machine",
   "main": "index.js",
   "directories": {

@@ -15,8 +15,7 @@ var container = document.getElementById('3d');
 // create a WebGL renderer, camera
 // and a scene
 var renderer = new THREE.WebGLRenderer({
-  antialias : true,
-  stencil   : true
+  antialias : true
 });
 
 var camera =
